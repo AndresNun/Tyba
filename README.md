@@ -31,11 +31,14 @@ This repository contains the backend API developed as part of the technical chal
 
 ### Environment Variables
 
-Three environment files are used depending on the context:
+Three environment files are used depending on the context, please follow the following minor changes:
 
-- `.env.development` – for local development
-- `.env.production` – for production or staging
-- `.env.test` – for automated testing
+- `.env.development` – for local development: NODE_ENV=development
+- `.env.production` – for production or staging: NODE_ENV=production
+- `.env.test` – for automated testing: DB_HOST=DB_REDIS=localhost
+
+Is a wrong practice to export this type of file, however, it will shown an example configuration.
+
 
 Example configuration:
 
