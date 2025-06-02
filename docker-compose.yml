@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.development
+    depends_on:
+      - postgres
+      - redis
+      - migrate
+    networks:
+      - tyba_network
+    command: >
+      sh -c "
+      npx wait-on tcp:postgres:5432 &&
+      npm run start:prod
+      "
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    env_file:
+      - .env.development
+    depends_on:
+      - postgres
+    networks:
+      - tyba_network
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+    command: npm run db-migrations
+
+  postgres:
+    image: postgres:15
+    container_name: tyba_postgres
+    environment:
+      POSTGRES_DB: tyba_db
+      POSTGRES_USER: tyba_dummy
+      POSTGRES_PASSWORD: tyba_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tyba_network
+
+  redis:
+    image: redis:7
+    container_name: tyba_redis
+    command: redis-server --requirepass ""
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tyba_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  tyba_network:
+    driver: bridge
