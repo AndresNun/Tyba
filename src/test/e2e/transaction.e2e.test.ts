@@ -1,5 +1,5 @@
 // List of Imports
-import App from 'app';
+import App from '../../app';
 import request from 'supertest';
 import { Application } from 'express';
 
@@ -13,9 +13,9 @@ describe('Transaction E2E', () => {
   let accessToken: string;
 
   const testUser = {
-    username: 'UserTest',
-    email: `user.${Date.now()}@test.com`,
-    password: 'verysecure123'
+    username: `desdSec+${Date.now()}`,
+    email: `desdSec+${Date.now()}@example.com`,
+    password: 'superssd-12'
   };
 
   beforeAll(async () => {
@@ -59,7 +59,7 @@ describe('Transaction E2E', () => {
      */
     it('Should create a transaction after restaurant search by city', async () => {
         await request(expressApp)
-          .get('/api/v1/restaurants/search')
+          .get('/api/v1/restaurants/')
           .query({ type: 'city', value: 'New York' })
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(200);
@@ -80,7 +80,7 @@ describe('Transaction E2E', () => {
        */
       it('Should create a transaction after restaurant search by coordinates', async () => {
         await request(expressApp)
-          .get('/api/v1/restaurants/search')
+          .get('/api/v1/restaurants/')
           .query({ type: 'coordinates', lat: 40.7128, lng: -74.0060 })
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(200);
@@ -115,7 +115,7 @@ describe('Transaction E2E', () => {
       await request(expressApp)
         .get('/api/v1/transactions')
         .set('Authorization', 'Bearer invalidtoken')
-        .expect(401);
+        .expect(403);
     });
   });
 });

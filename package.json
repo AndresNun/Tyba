@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "test": "jest",
-    "test:e2e": "node -r dotenv/config node_modules/.bin/jest --testPathPattern=e2e",
+    "test:e2e": "jest --config jest.config.ts",
+    "test:cov": "jest --config jest.config.ts --coverage",
     "dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/server.ts",
     "build": "rimraf ./dist && tsc",
     "start": "node dist/server.js",
@@ -25,6 +26,7 @@
     "body-parser": "^2.2.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "ioredis": "^5.6.1",
@@ -42,6 +44,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/ioredis": "^4.28.10",
     "@types/jest": "^29.5.14",
@@ -75,6 +78,7 @@
     "@middlewares": "dist/middlewares",
     "@dtos": "dist/dtos",
     "@common": "dist/common",
-    "@test": "dist/test"
+    "@test": "dist/test",
+    "app": "dist/app.js"
   }
 }

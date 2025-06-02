@@ -1,5 +1,5 @@
 // List of Imports
-import App from 'app';
+import App from '../../app';
 import { Application } from 'express';
 import request from 'supertest';
 
@@ -13,9 +13,9 @@ describe('Auth E2E Tests', () => {
     let expressApp: Application;
 
     const testUser = {
-        username: "Caelum",
-        email: `caelum+${Date.now()}@example.com`,
-        password: 'supersecret12',
+        username: `caelumNoc+${Date.now()}`,
+        email: `caelumNoc+${Date.now()}@example.com`,
+        password: 'super-12'
     };
       
     beforeAll(async () => {
@@ -26,7 +26,7 @@ describe('Auth E2E Tests', () => {
         // Create User
         await request(expressApp)
             .post('/api/v1/users')  
-            .send(testUser)
+            .send({ username: testUser.username, email: testUser.email, password: testUser.password })
             .expect(201);
     });
 
@@ -55,10 +55,11 @@ describe('Auth E2E Tests', () => {
         it('Should return 401 for invalid credentials', async () => {
         const response = await request(expressApp)
             .post('/api/v1/auth/login')
-            .send({ email: 'caelum@example.com', password: 'nosecret' })
+            .send({ email: 'caelum@example.com', password: 'norxscret' })
             .expect(401);
 
         expect(response.body).toHaveProperty('message');
+        expect(response.body.message.toLowerCase()).toContain('invalid');
         });
     });
 
@@ -80,23 +81,23 @@ describe('Auth E2E Tests', () => {
       
         it('Should return 200 and successfully logout with valid token', async () => {
           const response = await request(expressApp)
-            .post('/api/v1/auth/logout')
+            .delete('/api/v1/auth/logout')
             .set('Authorization', `Bearer ${accessToken}`)
             .expect(200);
         
           expect(response.body).toHaveProperty('message');
-          expect(response.body.message).toMatch(/logged out/i);
+          expect(response.body.message).toMatch('Logout successful');
         });
       
         it('Should return 401 if token is missing or invalid', async () => {
           await request(expressApp)
-            .post('/api/v1/auth/logout')
+            .delete('/api/v1/auth/logout')
             .expect(401);
       
           await request(expressApp)
-            .post('/api/v1/auth/logout')
-            .set('Authorization', 'Bearer token_invalido')
-            .expect(401);
+            .delete('/api/v1/auth/logout')
+            .set('Authorization', 'Bearer token_invalid')
+            .expect(403);
         });
     });      
 });

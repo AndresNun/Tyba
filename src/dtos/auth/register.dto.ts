@@ -1,5 +1,5 @@
 // List of Imports
-import { CreateUserDto } from "dtos/user/create-user.dto";
+import { CreateUserDto } from "@dtos/user/create-user.dto";
 
 /**
  * Re-use validations

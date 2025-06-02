@@ -1,5 +1,6 @@
 // List of Imports
 import "reflect-metadata";
+import 'module-alias/register';
 import { Container } from "typedi";
 import { useContainer as ormUseContainer } from "typeorm";
 
@@ -15,6 +16,8 @@ import express, { Application } from 'express';
 import { createMainRouter } from "@routes/index";
 import { DataSource, EntityManager } from "typeorm";
 import { DatabaseService } from '@config/database/postgre/database';
+import { errorHandler } from '@middlewares/errorHandler';
+import cors from 'cors';
 
 
 /**
@@ -67,6 +70,12 @@ class App {
 
     public configureMiddlewares() {
         console.log('[App] Configuring middlewares...');
+        this.app.use(cors({
+            origin: '*',
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true, 
+        }));
         this.app.use(express.json());
     }
 
@@ -82,6 +91,7 @@ class App {
             console.error('[App] Failed to configure routes:', err);
             throw err;
         }
+        this.app.use(errorHandler as any);
     }
      
     /**

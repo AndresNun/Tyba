@@ -7,13 +7,13 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-    
+
 # ------------------------
 # STAGE 2: Runtime
 # ------------------------
 FROM node:lts-slim
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --production
+RUN npm install   
 COPY --from=builder /app/dist ./dist
-CMD ["npm", "run", "start:migration"]
+CMD ["npm", "run", "test:e2e"]

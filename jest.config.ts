@@ -1,5 +1,6 @@
-// jest.config.js
-require('dotenv').config({ path: '.env.development' });
+// List of Imports
+require('module-alias/register'); 
+require('dotenv').config({ path: '.env.test' });
 
 /** @type {import('@jest/types').Config.InitialOptions} */
 const config = {
@@ -7,9 +8,8 @@ const config = {
   testEnvironment: 'node',
   roots: ['<rootDir>/src/test'],
   testMatch: ['**/e2e/**/*.test.ts'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
-    '^app$': '<rootDir>/src/app.ts',
+    "^app$": "<rootDir>/src/app.ts",
     '^@config/(.*)$': '<rootDir>/src/config/$1',
     '^@config$': '<rootDir>/src/config/index.ts',
     '^@entities/(.*)$': '<rootDir>/src/entities/$1',
@@ -27,6 +27,13 @@ const config = {
     '^@common/(.*)$': '<rootDir>/src/common/$1',
     '^@test/(.*)$': '<rootDir>/src/test/$1',
   },
+  moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.json',
+    },
+  },
+  setupFilesAfterEnv: [],
 };
 
 module.exports = config;

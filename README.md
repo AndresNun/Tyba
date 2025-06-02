@@ -4,23 +4,17 @@ This repository contains the backend API developed as part of the technical chal
 
 ---
 
-## 📚 Table of Contents
+## Table of Contents
 
-* [Environment Setup](#environment-setup)
-
-  * [Prerequisites](#prerequisites)
-  * [Environment Variables](#environment-variables)
-  * [Step 1: Start Services with Docker Compose (PostgreSQL & Redis)](#step-1-start-services-with-docker-compose-postgresql--redis)
-  * [Step 2: Run the NestJS App Locally](#step-2-run-the-nestjs-app-locally)
-* [Docker Compose Commands](#docker-compose-commands)
-* [Useful NPM Scripts](#useful-npm-scripts)
-* [Optional: Creating a New Migration](#optional-creating-a-new-migration)
-* [Architecture](#architecture)
-* [API Documentation](#api-documentation)
-* [Postman Collection](#postman-collection)
-* [Testing](#testing)
-* [Linting](#linting)
-* [Deployment](#deployment)
+- [Environment Setup](#environment-setup)  
+  - [Prerequisites](#prerequisites)  
+  - [Environment Variables](#environment-variables)  
+  - [Start Services](#start-app-with-docker-compose)  
+- [Docker Commands](#docker-commands)  
+- [Project Architecture](#project-architecture)  
+- [API Documentation](#api-documentation)  
+- [Testing](#testing)  
+- [Code Therapy Sessions](#code-therapy-sessions)
 
 ---
 
@@ -28,89 +22,95 @@ This repository contains the backend API developed as part of the technical chal
 
 ### Prerequisites
 
-* [Docker](https://www.docker.com/)
-* [Node.js](https://nodejs.org/) (version >= 16)
-* Environment files:
-
-  * `.env.development`
-  * `.env.production`
+- [Docker](https://www.docker.com/)
+- [Node.js](https://nodejs.org/) (version >= 16)
+- Environment files:
+  - `.env.development`
+  - `.env.production`
+  - `.env.test`
 
 ### Environment Variables
 
-Two `.env` files are used depending on the environment:
+Three environment files are used depending on the context:
 
-* `.env.development` — for local development
-* `.env.production` — for production or staging deployment
+- `.env.development` – for local development
+- `.env.production` – for production or staging
+- `.env.test` – for automated testing
 
-Example environment variables:
+Example configuration:
 
 ```env
-# Vars
+# App Settings
 PORT=8000
-API_PREFIX='/api/v1'
+API_PREFIX=/api/v1
 JWT_SECRET=super-secret-token
-GOOGLE_PLACES_API_KEY=TU_API
+GOOGLE_PLACES_API_KEY=your_api_key
 BLACKLIST_DURATION_SECONDS=3600
 
-# Database variables: Postgre SQL
+# PostgreSQL Settings
 DB_HOST=postgres
 DB_PORT=5432
 DB_POSTGRES=tyba_db
 DB_USERNAME=tyba_dummy
 DB_PASSWORD=tyba_secret
 
-# Database variables: Redis
+# Redis Settings
 REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_PASSWORD=tyba_secret_2
 REDIS_DB=0
 REDIS_PREFIX=api:
 
-
-# Enviroments
+# Environment
 NODE_ENV=development
 ```
 
 ---
 
-## Step 1: Start App with Docker Compose (PostgreSQL & Redis)
+## Start App with Docker Compose
 
 To build and start the application and its services (Redis, PostgreSQL):
 
 ```bash
-npm run docker:start
+docker-compose build --no-cache
+docker-compose up
 ```
+
+After the above command the services (Redis, PostgreSQL) and de Server will be available in the: http://localhost:PORT. 
+
 To stop and remove the containers:
 
 ```bash
 npm run docker:down
 ```
-
-After the Starte of the App the system will use the .env.development variables and
-will be available in the: http://localhost:PORT.
-
 ---
 
-## 🔧 Docker Compose Commands
+## Docker Commands
 
-| Command               | Description                                           |
-| --------------------- | ----------------------------------------------------- |
-| `npm run docker:dev`  | Build and run all services using `docker-compose.yml` |
-| `npm run docker:down` | Stop and remove all running containers                |
----
+| Command                      | Description                                           |
+| ---------------------------- | -----------------------------------------------------|
+| `docker-compose build --no-cache` | Build all services without using cache (clean build)   |
+| `docker-compose up`          | Start all services defined in `docker-compose.yml`    |
+| `npm run docker:down`        | Stop and remove all running containers                 |
 
-## 🏗️ Architecture
 
-The application is structuredwith the following monolitic arquitecture:
+## Project Architecture
 
-* **Common** to state enums and global variables to use
-* **Config** configurations of the database, Auth JWT, Google-API, Jest, Swagger
-* **Controllers** to handle HTTP requests
-* **Dtos** to handle validations
-* **Services** to encapsulate business logic
-* **Repositories** for database access using TypeORM
-* **Redis** for caching and throttling
-* **PostgreSQL** as the main database
+The application is structured using the following monolithic architecture:
+
+- **Common**: Contains enums and global variables used throughout the application.
+- **Config**: Holds configurations for the database, JWT authentication, Google API, Jest (testing), and Swagger (API documentation).
+- **Controllers**: Handle HTTP requests and responses.
+- **Dtos**: Manage data validation and transformation.
+- **Entities**: Define the database entities using TypeORM.
+- **Middlewares**: Implement middlewares for request handling, authentication, error handling, etc.
+- **Repositories**: Handle database access and operations using TypeORM.
+- **Routes**: Define the application routes and endpoints.
+- **Services**: Encapsulate the business logic.
+- **Test**: Contains end-to-end testing suites.
+- **Utils**: Utilities such as error handling, interfaces, and helper functions.
+- **Redis**: Used for caching and throttling.
+- **PostgreSQL**: The main database of the application.
 
 Folder structure:
 
@@ -127,33 +127,84 @@ src/
 └── main.ts
 ```
 
----
-
-## 📖 API Documentation
-
-
-
-```
-http://localhost:8000/docs
-```
+For a bigger project it is suggested to segmentate the responsabilities by the usage of microservices.
 
 ---
 
-## 🔁 Postman Collection
-
-You can import the Postman collection file to test all the endpoints manually.
-
-
-Steps:
-
-1. Open Postman
-2. Click `Import`
-3. Select the file `postman_collection.json`
-4. Use the environment variables for base URL and tokens if needed
+## API Documentation
 
 ---
 
-## 🧪 Testing
+### User
+
+Manages user-related operations.
+
+#### User Router
+
+- **POST `/`**  
+  Create a new user (`UserController.create`).
+
+- **GET `/`**  
+  Get all users (`UserController.getAllUsers`).
+
+- **GET `/:id`**  
+  Get user by ID (`UserController.getUserById`).
+
+Uses TypeDI for dependency injection and wraps handlers with `wrapHandlerInstance`.
+
+---
+
+### Authentication
+
+Handles user login and logout with JWT for secure access.
+
+#### Auth Router
+
+- **POST `/login`**  
+  User login (no authentication required).
+
+- **DELETE `/logout`**  
+  User logout (protected by `authenticateJWT` middleware).
+
+Middleware wrappers:  
+- `wrapAsync` to catch async errors in middleware.  
+- `wrapHandlerInstance` to handle async errors in controllers.
+
+---
+
+### Restaurant
+
+Handles restaurant data operations with authentication and request validation.
+
+#### Restaurant Router
+
+- **GET `/`**  
+  Search restaurants by query parameters.  
+  Requires JWT authentication (`authenticateJWT`) and validation (`validateSearch`).
+
+Middleware wrappers:  
+- `wrapAsync` for async middleware error handling.  
+- `wrapHandlerInstance` for controller error handling.
+
+---
+
+### Transaction
+
+Manages user transaction data.
+
+#### Transaction Router
+
+- **GET `/`**  
+  Get transactions for the authenticated user (`TransactionController.getTransactionsByUser`).  
+  Protected by `authenticateJWT`.
+
+Middleware wrappers:  
+- `wrapAsync` to handle async middleware errors.  
+- `wrapHandlerInstance` for controller error handling.
+
+---
+
+## Testing
 
 Expected behavior for the main user functionalities, covering both positive (successful) and negative (error) cases.
 
@@ -269,13 +320,7 @@ Expected behavior for the main user functionalities, covering both positive (suc
 To run all tests:
 
 ```bash
-npm run test
-```
-
-To run in watch mode:
-
-```bash
-npm run test:watch
+npm run test:e2e  
 ```
 
 To generate coverage report:
@@ -283,3 +328,8 @@ To generate coverage report:
 ```bash
 npm run test:cov
 ```
+
+## Code Therapy Sessions
+
+Our code still has room to improve just as human experience,
+so come back since even software deserves a little tough love!
